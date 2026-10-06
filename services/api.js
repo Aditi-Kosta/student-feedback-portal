@@ -1,5 +1,4 @@
-const USE_REAL_BACKEND =
-  process.env.NEXT_PUBLIC_USE_REAL_BACKEND === 'true';
+const USE_REAL_BACKEND = false;
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -243,6 +242,7 @@ export const submitFeedback = async (payload) => {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
+
       throw new Error(
         err.message || 'Failed to submit feedback.'
       );
