@@ -1,7 +1,5 @@
 const USE_REAL_BACKEND = false;
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
 const MOCK_DELAY = 300;
 
 let mockDatabase = [
@@ -191,25 +189,18 @@ let mockDatabase = [
   },
 ];
 
-const isOffline = () =>
-  typeof window !== 'undefined' && !navigator.onLine;
-
 const delay = (ms) =>
   new Promise((resolve) => setTimeout(resolve, ms));
 
 export const fetchAllFeedback = async () => {
-  if (isOffline()) {
-    throw new Error('Network offline. Please check your internet connection.');
-  }
-
   if (USE_REAL_BACKEND) {
-    const res = await fetch(`${API_URL}/api/feedback`);
+    const res = await fetch('/api/feedback');
 
     if (!res.ok) {
       throw new Error(`Server returned status code ${res.status}`);
     }
 
-    return res.json();
+    return await res.json();
   }
 
   await delay(MOCK_DELAY);
@@ -218,21 +209,17 @@ export const fetchAllFeedback = async () => {
 };
 
 export const submitFeedback = async (payload) => {
-  if (isOffline()) {
-    throw new Error('Network offline. Submission failed.');
-  }
-
   if (
     !payload.studentName ||
     !payload.subject ||
     !payload.rating ||
     !payload.comment
   ) {
-    throw new Error('Invalid payload: Missing required fields.');
+    throw new Error('All fields are required.');
   }
 
   if (USE_REAL_BACKEND) {
-    const res = await fetch(`${API_URL}/api/feedback`, {
+    const res = await fetch('/api/feedback', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -242,20 +229,22 @@ export const submitFeedback = async (payload) => {
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-
       throw new Error(
         err.message || 'Failed to submit feedback.'
       );
     }
 
-    return res.json();
+    return await res.json();
   }
 
   await delay(MOCK_DELAY);
 
   const newEntry = {
     id: String(Date.now()),
-    ...payload,
+    studentName: payload.studentName,
+    subject: payload.subject,
+    rating: Number(payload.rating),
+    comment: payload.comment,
     createdAt: new Date().toISOString(),
   };
 
