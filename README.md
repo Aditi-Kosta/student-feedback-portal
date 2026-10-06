@@ -1,129 +1,365 @@
-# Academic Feedback Portal (Frontend Layer)
+# Academic Feedback Portal
 
 ## System Overview
 
-The **Academic Feedback Portal** is an enterprise-grade web application designed for processing, evaluating, and viewing student feedback regarding registered academic coursework and faculty performance.
+The **Academic Feedback Portal** is a full-stack web application for collecting and viewing student feedback related to academic subjects.
 
-This repository contains the complete frontend architecture, UI components, state validation logic, and mock API service integration layer. The frontend is built using **Next.js** and **React**, featuring client-side form validation, real-time analytics aggregation, responsive dashboards, and network failure guards.
+The application uses **Next.js & React** for the frontend, **Node.js & Express** for the backend, and **MySQL** for persistent data storage.
+
+Students can submit their name, subject, rating, and comments. The feedback is sent to the backend through RESTful APIs and stored in the MySQL database.
 
 ---
 
-## Architectural Highlights & Implementation Details
+## Technology Stack
 
-### Modular UI Component Structure (`components/`)
+* **Frontend:** Next.js, React
+* **Backend:** Node.js, Express.js
+* **Database:** MySQL
+* **API:** RESTful API
+* **Database Driver:** MySQL2
+* **Configuration:** dotenv
+* **Version Control:** Git & GitHub
+
+---
+
+## Architecture
+
+```text
+React / Next.js
+      |
+      | REST API
+      ↓
+Node.js + Express
+      |
+      | SQL Queries
+      ↓
+MySQL Database
+```
+
+The frontend handles the user interface, forms, validation, and API communication.
+
+The backend handles API requests and database operations.
+
+The database stores the submitted feedback.
+
+---
+
+## Frontend
+
+The frontend is built using **React with Next.js** and follows a component-based structure.
+
+### Main Components
 
 * **`FeedbackForm.js`**
-
-  * Handles student input for course names, rating scores, and detailed comments.
-  * Provides client-side validation for character limits and required fields.
-  * Manages form state and submission logic.
+  * Handles feedback input.
+  * Collects student name, subject, rating, and comments.
+  * Performs basic validation.
 
 * **`FeedbackCard.js`**
-
-  * Displays individual feedback entries.
-  * Includes dynamic score badges, formatted date timestamps, and metadata tags.
+  * Displays individual feedback records.
 
 * **`Navbar.js`**
+  * Provides navigation across the application.
 
-  * Provides a sticky navigation header across submission and dashboard views.
+### API Service
 
-### Isolated API Service Layer (`services/api.js`)
+**`services/api.js`** handles communication between the frontend and backend.
 
-* Houses a centralized data service layer.
-* Implements stubbed asynchronous functions returning `Promise` objects and mock JSON records for development.
-* Includes network offline checks, payload validation, and error handling.
-* Uses a `USE_REAL_BACKEND` boolean flag to switch between mock data and live RESTful API endpoints during integration.
+It supports:
 
-### Analytics & Data Processing
+```text
+GET  /api/feedback
+POST /api/feedback
+```
 
-**`utils/formatters.js`** and **`pages/dashboard.js`** handle:
-
-* Real-time aggregate metrics, including:
-
-  * Total submission count
-  * Average satisfaction score
-* Multi-variable client-side filtering by:
-
-  * Rating score
-  * Text search queries
-* Safe parsing of ISO timestamps into formatted dates.
+The project also contains a mock-data mode that can be used during frontend development.
 
 ---
 
-## Directory Structure
+## Backend
+
+The backend is implemented using **Node.js & Express**.
+
+### `backend/server.js`
+
+The server handles:
+
+* REST API routes
+* Request validation
+* JSON requests
+* CORS
+* Database operations
+
+### API Endpoints
+
+#### GET `/api/feedback`
+
+Retrieves all feedback records from the database.
+
+#### POST `/api/feedback`
+
+Creates a new feedback record.
+
+Example request:
+
+```json
+{
+  "studentName": "Aditi Kosta",
+  "subject": "Web Programming",
+  "rating": 5,
+  "comment": "Excellent practical sessions"
+}
+```
+
+---
+
+## Database
+
+The project uses **MySQL**.
+
+### Database
+
+```text
+student_feedback
+```
+
+### Table
+
+```text
+feedback
+```
+
+### Table Fields
+
+| Field | Description |
+|---|---|
+| `id` | Unique feedback ID |
+| `studentName` | Student name |
+| `subject` | Subject name |
+| `rating` | Feedback rating |
+| `comment` | Feedback comment |
+| `createdAt` | Submission timestamp |
+
+The database can be created using:
+
+```text
+database/student_feedback.sql
+```
+
+---
+
+## Project Structure
 
 ```text
 student-feedback-portal/
+│
+├── backend/
+│   ├── db.js
+│   ├── server.js
+│   ├── package.json
+│   └── .env
+│
 ├── components/
-│   ├── FeedbackCard.js       # Component for rendering individual feedback entries
-│   ├── FeedbackForm.js       # Form input component with state validation
-│   └── Navbar.js             # Global navigation header component
+│   ├── FeedbackCard.js
+│   ├── FeedbackForm.js
+│   └── Navbar.js
+│
 ├── pages/
-│   ├── _app.js               # Global application wrapper and CSS resets
-│   ├── dashboard.js          # Analytics overview and feedback listing page
-│   └── index.js              # Student feedback submission page
+│   ├── _app.js
+│   ├── dashboard.js
+│   └── index.js
+│
 ├── services/
-│   └── api.js                # Centralized API service and mock database layer
+│   └── api.js
+│
 ├── utils/
-│   └── formatters.js         # Data transformation and formatting utilities
-├── .gitignore                # Git exclusion rules for node_modules and build files
-├── package.json              # Project dependencies and operational scripts
-└── README.md                 # Technical project documentation
+│   └── formatters.js
+│
+├── database/
+│   └── student_feedback.sql
+│
+├── .gitignore
+├── package.json
+└── README.md
 ```
+
+> `.env` and `.env.local` contain local configuration and should not be committed to GitHub.
 
 ---
 
-## Installation & Setup Guide
-
-Follow the instructions below to install and run the project on a local machine.
+## Installation & Setup
 
 ### Prerequisites
 
-Ensure the following are installed:
+* **Node.js** v18 or higher
+* **npm**
+* **MySQL**
+* **Git**
 
-* **Node.js** `v18.0.0` or higher
-* **npm** (Node Package Manager)
-
-### Step 1: Clone the Repository
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/aditikosta/student-feedback-portal.git
+git clone https://github.com/Aditi-Kosta/student-feedback-portal.git
 cd student-feedback-portal
 ```
 
-### Step 2: Install Project Dependencies
-
-Run the following command in the project root directory:
+### 2. Install Frontend Dependencies
 
 ```bash
 npm install
 ```
 
-This installs the required project dependencies, including:
+### 3. Setup MySQL Database
 
-* `next`
-* `react`
-* `react-dom`
+Start MySQL and create the database:
 
-### Step 3: Run the Development Server
+```sql
+CREATE DATABASE student_feedback;
+```
 
-Start the Next.js development server:
+Import the SQL file:
+
+```text
+database/student_feedback.sql
+```
+
+Verify the database:
+
+```sql
+USE student_feedback;
+SHOW TABLES;
+```
+
+The `feedback` table should be present.
+
+### 4. Setup Backend
+
+```bash
+cd backend
+npm install
+```
+
+Create:
+
+```text
+backend/.env
+```
+
+Add:
+
+```env
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=YOUR_MYSQL_PASSWORD
+DB_NAME=student_feedback
+DB_PORT=3306
+```
+
+Replace `YOUR_MYSQL_PASSWORD` with your MySQL password.
+
+### 5. Start Backend
+
+From the `backend` directory:
+
+```bash
+node server.js
+```
+
+The backend runs at:
+
+```text
+http://localhost:5000
+```
+
+### 6. Configure Frontend
+
+Create `.env.local` in the project root:
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:5000
+```
+
+### 7. Start Frontend
+
+Open another terminal in the project root:
 
 ```bash
 npm run dev
 ```
 
-### Step 4: Access the Application
+Open:
 
-Once the development server is running, open your browser and navigate to:
+```text
+http://localhost:3000
+```
 
-* **Submission Form:** http://localhost:3000/
-* **Analytics Dashboard:** http://localhost:3000/dashboard
+### Application Pages
+
+```text
+Submission Form:
+http://localhost:3000/
+
+Dashboard:
+http://localhost:3000/dashboard
+```
 
 ---
 
-## Development Notes
+## Application Flow
 
-The project currently uses a **mock API service layer** for development and testing. The `USE_REAL_BACKEND` configuration flag in `services/api.js` can be used to switch to a real REST API when backend integration is available.
+```text
+Student
+   ↓
+Feedback Form
+   ↓
+Next.js / React
+   ↓
+REST API
+   ↓
+Express Backend
+   ↓
+MySQL Database
+```
 
-The frontend is structured to keep UI components, API communication, and data formatting logic separated for easier maintenance and future scalability.
+The frontend does not directly access MySQL. All database operations are performed through the backend API.
+
+---
+
+## Current Functionality
+
+* Student feedback submission
+* Feedback validation
+* Feedback storage in MySQL
+* Feedback retrieval
+* Dashboard for viewing feedback
+* Rating and text-based filtering
+* REST API integration
+* Mock-data support for frontend development
+
+The current backend primarily implements **Create & Read** operations.
+
+---
+
+## Security & Configuration
+
+* Database credentials are stored in environment variables.
+* `.env` files are excluded from Git.
+* Parameterized SQL queries are used for database insertion.
+* The frontend communicates with MySQL only through the backend API.
+
+---
+
+## Version Control
+
+The project is maintained using **Git & GitHub** for source control and team collaboration.
+
+---
+
+## Future Improvements
+
+* Student and administrator authentication
+* Role-based access
+* Update & delete feedback
+* Advanced analytics
+* Automated testing
+* Production deployment
